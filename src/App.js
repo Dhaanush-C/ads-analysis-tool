@@ -38,7 +38,6 @@ export default function App() {
     try {
       return JSON.parse(text);
     } catch {
-      // Try to extract JSON from messy response
       const match = text.match(/\{[\s\S]*\}/);
       if (match) {
         try {
@@ -67,7 +66,7 @@ KEYWORDS: ${JSON.stringify(keywords)}
 ADS: ${JSON.stringify(ads)}
 SEARCH TERMS: ${JSON.stringify(searchTerms)}
 
-Return ONLY valid JSON. No explanation.
+Return ONLY JSON. No explanation.
 
 Format:
 {
@@ -107,31 +106,16 @@ Format:
 
       <h3>Upload CSV Files</h3>
 
-      <div>
-        <label>Campaigns:</label><br />
-        <input type="file" onChange={(e) => handleFile("campaigns", e.target.files[0])} />
-      </div>
+      <input type="file" onChange={(e) => handleFile("campaigns", e.target.files[0])} />
+      <br /><br />
 
-      <br />
+      <input type="file" onChange={(e) => handleFile("keywords", e.target.files[0])} />
+      <br /><br />
 
-      <div>
-        <label>Keywords:</label><br />
-        <input type="file" onChange={(e) => handleFile("keywords", e.target.files[0])} />
-      </div>
+      <input type="file" onChange={(e) => handleFile("ads", e.target.files[0])} />
+      <br /><br />
 
-      <br />
-
-      <div>
-        <label>Ads:</label><br />
-        <input type="file" onChange={(e) => handleFile("ads", e.target.files[0])} />
-      </div>
-
-      <br />
-
-      <div>
-        <label>Search Terms:</label><br />
-        <input type="file" onChange={(e) => handleFile("searchTerms", e.target.files[0])} />
-      </div>
+      <input type="file" onChange={(e) => handleFile("searchTerms", e.target.files[0])} />
 
       <br /><br />
 
