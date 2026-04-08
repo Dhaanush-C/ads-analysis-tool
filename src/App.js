@@ -12,6 +12,7 @@ export default function App() {
   const readCSV = (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
+
       reader.onload = (e) => {
         const text = e.target.result;
 
@@ -26,7 +27,7 @@ export default function App() {
           return obj;
         });
 
-        resolve(data.slice(0, 50)); // limit rows
+        resolve(data.slice(0, 50));
       };
 
       reader.readAsText(file);
@@ -68,7 +69,6 @@ Return ONLY valid JSON with:
 
       const raw = await resp.json();
 
-      // ✅ get text from backend
       const txt = raw.text || "";
 
       let parsed;
@@ -95,35 +95,20 @@ Return ONLY valid JSON with:
     <div style={{ padding: 30, fontFamily: "Arial" }}>
       <h1>🚀 Ads Audit Tool</h1>
 
-      <div style={{ marginBottom: 20 }}>
-        <h3>Upload CSV Files</h3>
+      <h3>Upload CSV Files</h3>
 
-        <div>
-          <label>Campaigns:</label><br />
-          <input type="file" onChange={(e) => handleFile("campaigns", e.target.files[0])} />
-        </div>
+      <input type="file" onChange={(e) => handleFile("campaigns", e.target.files[0])} />
+      <br /><br />
 
-        <br />
+      <input type="file" onChange={(e) => handleFile("keywords", e.target.files[0])} />
+      <br /><br />
 
-        <div>
-          <label>Keywords:</label><br />
-          <input type="file" onChange={(e) => handleFile("keywords", e.target.files[0])} />
-        </div>
+      <input type="file" onChange={(e) => handleFile("ads", e.target.files[0])} />
+      <br /><br />
 
-        <br />
+      <input type="file" onChange={(e) => handleFile("searchTerms", e.target.files[0])} />
 
-        <div>
-          <label>Ads:</label><br />
-          <input type="file" onChange={(e) => handleFile("ads", e.target.files[0])} />
-        </div>
-
-        <br />
-
-        <div>
-          <label>Search Terms:</label><br />
-          <input type="file" onChange={(e) => handleFile("searchTerms", e.target.files[0])} />
-        </div>
-      </div>
+      <br /><br />
 
       <button onClick={runAudit} disabled={loading}>
         {loading ? "Running Audit..." : "Run Audit"}
@@ -132,15 +117,7 @@ Return ONLY valid JSON with:
       {result && (
         <div style={{ marginTop: 30 }}>
           <h2>Result</h2>
-
-          <pre
-            style={{
-              background: "#f4f4f4",
-              padding: 15,
-              borderRadius: 8,
-              overflowX: "auto"
-            }}
-          >
+          <pre style={{ background: "#f4f4f4", padding: 15 }}>
             {JSON.stringify(result, null, 2)}
           </pre>
         </div>
