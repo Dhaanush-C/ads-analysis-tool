@@ -59,23 +59,16 @@ export default function App() {
       const searchTerms = files.searchTerms ? await readCSV(files.searchTerms) : [];
 
       const prompt = `
-You are a Google Ads expert. Analyze the following data.
+const prompt = `
+Analyze this Google Ads data and return JSON only.
 
-CAMPAIGNS: ${JSON.stringify(campaigns)}
-KEYWORDS: ${JSON.stringify(keywords)}
-ADS: ${JSON.stringify(ads)}
-SEARCH TERMS: ${JSON.stringify(searchTerms)}
+Campaigns: ${JSON.stringify(campaigns)}
+Keywords: ${JSON.stringify(keywords)}
 
-IMPORTANT:
-Return ONLY valid JSON.
-Do not explain anything.
-Do not add any text before or after JSON.
-
-Format:
+Return JSON:
 {
   "overall_score": number,
   "key_issues": [],
-  "wasted_spend_estimate": number,
   "recommendations": []
 }
 `;
