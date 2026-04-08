@@ -34,6 +34,21 @@ export default function App() {
     });
   };
 
+  const extractJSON = (text) => {
+    try {
+      return JSON.parse(text);
+    } catch {
+      // Try to extract JSON from messy response
+      const match = text.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          return JSON.parse(match[0]);
+        } catch {}
+      }
+      return { error: "Invalid response", raw: text };
+    }
+  };
+
   const runAudit = async () => {
     try {
       setLoading(true);
@@ -45,18 +60,22 @@ export default function App() {
       const searchTerms = files.searchTerms ? await readCSV(files.searchTerms) : [];
 
       const prompt = `
-You are a Google Ads expert. Analyze the account data.
+You are a Google Ads expert. Analyze the following data.
 
 CAMPAIGNS: ${JSON.stringify(campaigns)}
 KEYWORDS: ${JSON.stringify(keywords)}
 ADS: ${JSON.stringify(ads)}
 SEARCH TERMS: ${JSON.stringify(searchTerms)}
 
-Return ONLY valid JSON with:
-- overall_score (0-100)
-- key_issues (array)
-- wasted_spend_estimate (number)
-- recommendations (array)
+Return ONLY valid JSON. No explanation.
+
+Format:
+{
+  "overall_score": number,
+  "key_issues": [],
+  "wasted_spend_estimate": number,
+  "recommendations": []
+}
 `;
 
       const resp = await fetch("/api/audit", {
@@ -71,16 +90,7 @@ Return ONLY valid JSON with:
 
       const txt = raw.text || "";
 
-      let parsed;
-
-      try {
-        parsed = JSON.parse(txt);
-      } catch {
-        parsed = {
-          error: "Invalid AI response",
-          raw: txt || raw
-        };
-      }
+      const parsed = extractJSON(txt);
 
       setResult(parsed);
 
@@ -93,20 +103,35 @@ Return ONLY valid JSON with:
 
   return (
     <div style={{ padding: 30, fontFamily: "Arial" }}>
-      <h1>🚀 Ads Audit Tool</h1>
+      <h1>🚀 Ads Audit Tool (Gemini)</h1>
 
       <h3>Upload CSV Files</h3>
 
-      <input type="file" onChange={(e) => handleFile("campaigns", e.target.files[0])} />
-      <br /><br />
+      <div>
+        <label>Campaigns:</label><br />
+        <input type="file" onChange={(e) => handleFile("campaigns", e.target.files[0])} />
+      </div>
 
-      <input type="file" onChange={(e) => handleFile("keywords", e.target.files[0])} />
-      <br /><br />
+      <br />
 
-      <input type="file" onChange={(e) => handleFile("ads", e.target.files[0])} />
-      <br /><br />
+      <div>
+        <label>Keywords:</label><br />
+        <input type="file" onChange={(e) => handleFile("keywords", e.target.files[0])} />
+      </div>
 
-      <input type="file" onChange={(e) => handleFile("searchTerms", e.target.files[0])} />
+      <br />
+
+      <div>
+        <label>Ads:</label><br />
+        <input type="file" onChange={(e) => handleFile("ads", e.target.files[0])} />
+      </div>
+
+      <br />
+
+      <div>
+        <label>Search Terms:</label><br />
+        <input type="file" onChange={(e) => handleFile("searchTerms", e.target.files[0])} />
+      </div>
 
       <br /><br />
 
