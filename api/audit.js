@@ -9,14 +9,14 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-5.3",
+        model: "gpt-4.1-mini",
         input: [
           {
             role: "user",
             content: prompt
           }
         ],
-        response_format: { type: "json_object" }
+        text: { format: { type: "json_object" } }
       })
     });
 
@@ -29,15 +29,13 @@ export default async function handler(req, res) {
       });
     }
 
-    // ✅ SAFE extraction
     const output =
       data.output?.[0]?.content?.[0]?.text ||
       data.output_text ||
       "";
 
     res.status(200).json({
-      text: output,
-      full: data
+      text: output
     });
 
   } catch (err) {
