@@ -27,7 +27,7 @@ export default function App() {
           return obj;
         });
 
-        resolve(data.slice(0, 50));
+        resolve(data.slice(0, 20));
       };
 
       reader.readAsText(file);
@@ -66,7 +66,10 @@ KEYWORDS: ${JSON.stringify(keywords)}
 ADS: ${JSON.stringify(ads)}
 SEARCH TERMS: ${JSON.stringify(searchTerms)}
 
-Return ONLY JSON. No explanation.
+IMPORTANT:
+Return ONLY valid JSON.
+Do not explain anything.
+Do not add any text before or after JSON.
 
 Format:
 {
