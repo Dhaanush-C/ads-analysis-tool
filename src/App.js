@@ -27,7 +27,7 @@ export default function App() {
           return obj;
         });
 
-        resolve(data.slice(0, 20));
+        resolve(data.slice(0, 5));
       };
 
       reader.readAsText(file);
