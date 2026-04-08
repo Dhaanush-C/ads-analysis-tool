@@ -14,7 +14,11 @@ export default async function handler(req, res) {
             {
               parts: [{ text: prompt }]
             }
-          ]
+          ],
+          generationConfig: {
+            temperature: 0.2,
+            maxOutputTokens: 2048
+          }
         })
       }
     );
@@ -28,11 +32,17 @@ export default async function handler(req, res) {
       });
     }
 
-    const output =
-      data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    console.log("Gemini RAW:", JSON.stringify(data));
+
+    let output = "";
+
+    if (data.candidates && data.candidates.length > 0) {
+      const parts = data.candidates[0].content.parts;
+      output = parts.map(p => p.text).join("");
+    }
 
     res.status(200).json({
-      text: output
+      text: output || "NO_RESPONSE"
     });
 
   } catch (err) {
