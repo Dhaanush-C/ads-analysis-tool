@@ -14,15 +14,21 @@ export default function App() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target.result;
-        const rows = text.split("\n").map(r => r.split(","));
+
+        const rows = text.split("\n").map((r) => r.split(","));
         const headers = rows[0];
-        const data = rows.slice(1).map(row => {
+
+        const data = rows.slice(1).map((row) => {
           let obj = {};
-          headers.forEach((h, i) => obj[h] = row[i]);
+          headers.forEach((h, i) => {
+            obj[h?.trim()] = row[i]?.trim();
+          });
           return obj;
         });
+
         resolve(data.slice(0, 50)); // limit rows
       };
+
       reader.readAsText(file);
     });
   };
@@ -30,6 +36,7 @@ export default function App() {
   const runAudit = async () => {
     try {
       setLoading(true);
+      setResult(null);
 
       const campaigns = files.campaigns ? await readCSV(files.campaigns) : [];
       const keywords = files.keywords ? await readCSV(files.keywords) : [];
@@ -44,11 +51,11 @@ KEYWORDS: ${JSON.stringify(keywords)}
 ADS: ${JSON.stringify(ads)}
 SEARCH TERMS: ${JSON.stringify(searchTerms)}
 
-Return JSON with:
-- overall_score
-- key_issues
-- wasted_spend_estimate
-- recommendations
+Return ONLY valid JSON with:
+- overall_score (0-100)
+- key_issues (array)
+- wasted_spend_estimate (number)
+- recommendations (array)
 `;
 
       const resp = await fetch("/api/audit", {
@@ -61,16 +68,18 @@ Return JSON with:
 
       const raw = await resp.json();
 
-      const txt =
-        raw.output?.[0]?.content?.[0]?.text ||
-        raw.output_text ||
-        "";
+      // ✅ get text from backend
+      const txt = raw.text || "";
 
       let parsed;
+
       try {
         parsed = JSON.parse(txt);
       } catch {
-        parsed = { error: "Invalid response", raw: txt };
+        parsed = {
+          error: "Invalid AI response",
+          raw: txt || raw
+        };
       }
 
       setResult(parsed);
@@ -87,28 +96,51 @@ Return JSON with:
       <h1>🚀 Ads Audit Tool</h1>
 
       <div style={{ marginBottom: 20 }}>
-        <p>Upload CSV Files:</p>
+        <h3>Upload CSV Files</h3>
 
-        <input type="file" onChange={(e) => handleFile("campaigns", e.target.files[0])} />
-        <br /><br />
+        <div>
+          <label>Campaigns:</label><br />
+          <input type="file" onChange={(e) => handleFile("campaigns", e.target.files[0])} />
+        </div>
 
-        <input type="file" onChange={(e) => handleFile("keywords", e.target.files[0])} />
-        <br /><br />
+        <br />
 
-        <input type="file" onChange={(e) => handleFile("ads", e.target.files[0])} />
-        <br /><br />
+        <div>
+          <label>Keywords:</label><br />
+          <input type="file" onChange={(e) => handleFile("keywords", e.target.files[0])} />
+        </div>
 
-        <input type="file" onChange={(e) => handleFile("searchTerms", e.target.files[0])} />
+        <br />
+
+        <div>
+          <label>Ads:</label><br />
+          <input type="file" onChange={(e) => handleFile("ads", e.target.files[0])} />
+        </div>
+
+        <br />
+
+        <div>
+          <label>Search Terms:</label><br />
+          <input type="file" onChange={(e) => handleFile("searchTerms", e.target.files[0])} />
+        </div>
       </div>
 
       <button onClick={runAudit} disabled={loading}>
-        {loading ? "Running..." : "Run Audit"}
+        {loading ? "Running Audit..." : "Run Audit"}
       </button>
 
       {result && (
-        <div style={{ marginTop: 20 }}>
-          <h2>Result:</h2>
-          <pre style={{ background: "#f4f4f4", padding: 15 }}>
+        <div style={{ marginTop: 30 }}>
+          <h2>Result</h2>
+
+          <pre
+            style={{
+              background: "#f4f4f4",
+              padding: 15,
+              borderRadius: 8,
+              overflowX: "auto"
+            }}
+          >
             {JSON.stringify(result, null, 2)}
           </pre>
         </div>
